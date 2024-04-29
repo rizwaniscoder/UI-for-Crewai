@@ -1,0 +1,6 @@
+streamlit
+crewai
+langchain_anthropic
+langchain_groq
+duckduckgo-search
+PyPDF2
