@@ -1,5 +1,6 @@
 streamlit
 pysqlite3-binary
+chromadb
 crewai
 duckduckgo-search
 langchain
