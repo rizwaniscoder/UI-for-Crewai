@@ -1,6 +1,8 @@
 streamlit
-crewai[tools]
+pysqlite3-binary
+crewai
+duckduckgo-search
+langchain
 langchain_anthropic
 langchain_groq
-duckduckgo-search
 PyPDF2
