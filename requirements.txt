@@ -1,5 +1,5 @@
 streamlit
-crewai['tools']
+crewai[tools]
 langchain_anthropic
 langchain_groq
 duckduckgo-search
