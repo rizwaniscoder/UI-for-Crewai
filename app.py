@@ -3,6 +3,7 @@ import streamlit as st
 import sys
 import re
 import PyPDF2
+
 # Assuming these previously imported modules ("crewai", "langchain_openai", etc.) exist and are accurate based on the provided code snippet
 from crewai import Agent, Task, Crew, Process
 from langchain_openai import ChatOpenAI
@@ -55,7 +56,8 @@ class CrewAIApp:
         agent_details = self.collect_agent_details(number_of_agents)
 
         # PDF Analysis
-        pdf = st.file_uploader("Upload PDF for Analysis", type=['pdf'])
+        number_of_pdfs = st.number_input("Number of PDFs for Analysis:", min_value=1, max_value=10, value=1, step=1)
+        pdfs = self.upload_pdfs(number_of_pdfs)
 
         # Task configuration
         tasks_list = [st.text_input(f"Task for Agent {i+1}", key=f"task_{i}") for i in range(number_of_agents)]
@@ -67,7 +69,7 @@ class CrewAIApp:
             elif not agent_details or not all(tasks_list):
                 st.error("All agent details and tasks are required.")
             else:
-                self.run_crew_analysis(agent_details, tasks_list, llm_option, api_key, pdf)
+                self.run_crew_analysis(agent_details, tasks_list, llm_option, api_key, pdfs)
 
     def collect_agent_details(self, number_of_agents):
         agent_details = []
@@ -79,7 +81,15 @@ class CrewAIApp:
                 agent_details.append((role, goal, backstory))
         return agent_details
 
-    def run_crew_analysis(self, agent_details, tasks_list, llm_option, api_key, pdf):
+    def upload_pdfs(self, number_of_pdfs):
+        pdfs = []
+        for i in range(number_of_pdfs):
+            pdf = st.file_uploader(f"Upload PDF {i+1} for Analysis", type=['pdf'])
+            if pdf:
+                pdfs.append(pdf)
+        return pdfs
+
+    def run_crew_analysis(self, agent_details, tasks_list, llm_option, api_key, pdfs):
         process_output_expander = st.expander("Processing Output:")
         sys.stdout = StreamToExpander(process_output_expander)
 
@@ -92,16 +102,17 @@ class CrewAIApp:
                 return
 
             # Append PDF contents to the first agent's task description
-            if pdf is not None and tasks:
-                try:
-                    pdf_reader = PyPDF2.PdfReader(pdf)
-                    pdf_text = ""
-                    for page_num in range(len(pdf_reader.pages)):
-                        page = pdf_reader.pages[page_num] 
-                        pdf_text += page.extract_text()
-                    tasks[0].description += "\n\n" + pdf_text
-                except Exception as e:
-                    st.error(f"Failed to read PDF contents: {e}")
+            if pdfs and tasks:
+                for pdf in pdfs:
+                    try:
+                        pdf_reader = PyPDF2.PdfReader(pdf)
+                        pdf_text = ""
+                        for page_num in range(len(pdf_reader.pages)):
+                            page = pdf_reader.pages[page_num] 
+                            pdf_text += page.extract_text()
+                        tasks[0].description += "\n\n" + pdf_text
+                    except Exception as e:
+                        st.error(f"Failed to read PDF contents: {e}")
 
             crew = Crew(agents=agents, tasks=tasks, verbose=2, process=Process.sequential)
             crew_result = crew.kickoff()
