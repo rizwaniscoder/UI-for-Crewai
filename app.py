@@ -1,10 +1,8 @@
-# Import necessary libraries
 import streamlit as st
 import sys
 import re
 import PyPDF2
 
-# Assuming these previously imported modules ("crewai", "langchain_openai", etc.) exist and are accurate based on the provided code snippet
 from crewai import Agent, Task, Crew, Process
 from langchain_openai import ChatOpenAI
 from langchain_anthropic import ChatAnthropic
