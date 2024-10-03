@@ -8,3 +8,4 @@ langchain
 langchain_anthropic
 langchain_groq
 PyPDF2
+langsmith
